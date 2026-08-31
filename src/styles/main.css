@@ -700,8 +700,14 @@ a {
 
   .stage__video {
     transform: scale(1.02);
+    /* no per-frame transform on mobile -> don't reserve a transform layer */
+    will-change: auto;
     /* favour the upper-middle of each landscape shot when cropped to portrait */
     object-position: center 38%;
+  }
+  /* mix-blend-mode grain forces an offscreen pass on every video repaint */
+  .stage__film {
+    display: none;
   }
 
   /* hotspots — bigger tap target, panel as a bottom sheet */

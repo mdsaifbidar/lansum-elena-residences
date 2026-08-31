@@ -39,11 +39,10 @@ const dom = {
 const lenis = new Lenis({
   lerp: reduced ? 1 : 0.12,
   smoothWheel: !reduced,
-  // drive touch scrolling through Lenis too, so the scrub stays connected to
-  // the finger instead of coasting on native momentum past several shots
-  syncTouch: isMobile && !reduced,
-  syncTouchLerp: 0.09,
-  touchInertiaMultiplier: 12,
+  // leave touch scrolling to the browser — native momentum is compositor-thread
+  // and far smoother on phones than JS-driven scroll. With the long pacing a
+  // momentum coast only crosses ~one shot anyway.
+  syncTouch: false,
 });
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -93,6 +92,7 @@ document.querySelectorAll('[data-anchor]').forEach((a) =>
    Per-frame overlay driving
    ------------------------------------------------------------------------- */
 let cueGone = false;
+let mProgressChapter = -1;
 function onScrub(time, _p, waitingOnBuffer) {
   const p = clamp(time / VIDEO_DURATION);
 
@@ -128,7 +128,7 @@ function onScrub(time, _p, waitingOnBuffer) {
   });
 
   // mobile progress bar (stands in for the hidden rail)
-  if (dom.mProgress) {
+  if (isMobile && dom.mProgress) {
     let ci = 0;
     for (let i = CHAPTERS.length - 1; i >= 0; i -= 1) {
       if (time >= CHAPTERS[i].start) {
@@ -137,13 +137,18 @@ function onScrub(time, _p, waitingOnBuffer) {
       }
     }
     dom.mProgressFill.style.width = (p * 100).toFixed(1) + '%';
-    dom.mProgressLabel.innerHTML =
-      `<b>${CHAPTERS[ci].kicker}</b>&nbsp; ${CHAPTERS[ci].title}`;
+    if (ci !== mProgressChapter) {
+      mProgressChapter = ci;
+      dom.mProgressLabel.innerHTML =
+        `<b>${CHAPTERS[ci].kicker}</b>&nbsp; ${CHAPTERS[ci].title}`;
+    }
     gsap.set(dom.mProgress, { opacity: 1 - endFade });
   }
 
-  // very subtle breathing parallax on the film (skip if reduced motion)
-  if (!reduced) {
+  // very subtle breathing parallax on the film — desktop only. On phones a
+  // per-frame transform on a full-screen <video> is pure compositor cost for
+  // almost no payoff on a small screen, and it competes with touch scrolling.
+  if (!reduced && !isMobile) {
     const idx = Math.min(
       CHAPTERS.length - 1,
       CHAPTERS.findIndex((c) => time < c.end)
