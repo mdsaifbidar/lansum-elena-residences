@@ -1,0 +1,44 @@
+:root {
+  /* --- Colour ---------------------------------------------------------- */
+  --white: #ffffff;
+  --cream: #faf7f2;
+  --off-white: #f5f0e8;
+  --charcoal: #1a1a1a;
+  --deep-warm: #2d2b27;
+  --black: #0c0b0a;
+  --gold: #c9a96e;
+  --gold-bright: #d9bd8a;
+  --sage: #8fa68b;
+  --text-muted: #7a7570;
+  --on-dark: rgba(255, 255, 255, 0.92);
+  --on-dark-soft: rgba(255, 255, 255, 0.62);
+
+  /* --- Type ----------------------------------------------------------- */
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* --- Motion ------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition: 0.5s var(--ease-standard);
+
+  /* --- Spacing (4px base) --------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* --- Layout ------------------------------------------------- */
+  --edge: clamp(20px, 5vw, 60px);
+  --z-video: 1;
+  --z-overlay: 10;
+  --z-nav: 40;
+  --z-loader: 100;
+}

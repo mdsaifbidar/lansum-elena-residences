@@ -1,0 +1,614 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+@import './variables.css';
+
+/* ===========================================================================
+   Reset / base
+   =========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--on-dark);
+  background: var(--black);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.04;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--black);
+}
+
+/* ===========================================================================
+   Loader
+   =========================================================================== */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  background: var(--black);
+  transition: opacity 0.8s var(--ease-out), visibility 0.8s var(--ease-out);
+}
+.loader.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loader__mark {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  letter-spacing: 0.22em;
+  color: var(--on-dark);
+  text-indent: 0.22em;
+}
+.loader__bar {
+  width: min(220px, 52vw);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+.loader__fill {
+  width: 0%;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.3s var(--ease-out);
+}
+.loader__hint {
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--on-dark-soft);
+}
+
+/* ===========================================================================
+   Fixed stage: the video is the hero and never scrolls
+   =========================================================================== */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-video);
+  overflow: hidden;
+  background: var(--black);
+}
+
+.stage__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* a hair of scale so parallax never reveals an edge */
+  transform: scale(1.06);
+  will-change: transform;
+}
+
+/* cinematic vignette + grade so overlay type always reads */
+.stage__grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(12, 11, 10, 0.62) 0%,
+      rgba(12, 11, 10, 0.12) 14%,
+      rgba(12, 11, 10, 0) 40%,
+      rgba(12, 11, 10, 0.28) 62%,
+      rgba(12, 11, 10, 0.82) 92%,
+      rgba(12, 11, 10, 0.92) 100%
+    ),
+    radial-gradient(
+      130% 95% at 50% 42%,
+      rgba(12, 11, 10, 0) 48%,
+      rgba(12, 11, 10, 0.5) 100%
+    );
+}
+
+.stage__film {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===========================================================================
+   Scroll track — gives the page its height; nothing visible lives here
+   =========================================================================== */
+
+.track {
+  position: relative;
+  z-index: var(--z-overlay);
+  width: 100%;
+}
+
+/* ===========================================================================
+   Top bar
+   =========================================================================== */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--edge);
+  color: var(--white);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+}
+.topbar__mark {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+}
+.topbar__cta {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding-bottom: 3px;
+  border-bottom: 1px solid currentColor;
+}
+
+/* ===========================================================================
+   Chapter overlays
+   =========================================================================== */
+
+.chapters {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+.chapter {
+  position: absolute;
+  left: var(--edge);
+  bottom: clamp(48px, 9vh, 84px);
+  max-width: min(29rem, 74vw);
+  opacity: 0;
+  transform: translateY(26px);
+  will-change: opacity, transform;
+  text-shadow: 0 1px 20px rgba(0, 0, 0, 0.45);
+}
+
+.chapter__kicker {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  margin-bottom: var(--space-3);
+}
+.chapter__title {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  color: var(--white);
+  margin-bottom: var(--space-3);
+}
+.chapter__line {
+  font-size: clamp(0.95rem, 1.4vw, 1.08rem);
+  color: var(--on-dark);
+  max-width: 24rem;
+}
+.chapter__observed {
+  margin-top: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+}
+.chapter__observed li {
+  list-style: none;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  padding-left: var(--space-4);
+  position: relative;
+}
+.chapter__observed li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ===========================================================================
+   Hotspots
+   =========================================================================== */
+
+.hotspot {
+  position: absolute;
+  z-index: calc(var(--z-overlay) + 1);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-out);
+}
+.hotspot.is-live {
+  opacity: 1;
+  pointer-events: auto;
+}
+.hotspot__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+}
+.hotspot__dot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  animation: hs-pulse 2.6s var(--ease-out) infinite;
+}
+@keyframes hs-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.hotspot__panel {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%) translateX(-8px);
+  width: max-content;
+  max-width: 15rem;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(12, 11, 10, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--on-dark);
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.hotspot:hover .hotspot__panel,
+.hotspot.is-open .hotspot__panel {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ===========================================================================
+   Progress rail
+   =========================================================================== */
+
+.rail {
+  position: fixed;
+  right: var(--edge);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-nav);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+.rail__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  transition: color 0.4s var(--ease-out);
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.5));
+}
+.rail__label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+  white-space: nowrap;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+.rail__tick {
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.4s var(--ease-out);
+}
+.rail__item:hover,
+.rail__item.is-active {
+  color: var(--white);
+}
+.rail__item.is-active .rail__tick {
+  width: 40px;
+  background: var(--gold);
+}
+.rail__item.is-active .rail__label,
+.rail__item:hover .rail__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ===========================================================================
+   Scroll cue (intro)
+   =========================================================================== */
+
+.cue {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-10);
+  transform: translateX(-50%);
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--on-dark-soft);
+  transition: opacity 0.6s var(--ease-out);
+}
+.cue.is-gone {
+  opacity: 0;
+  pointer-events: none;
+}
+.cue__text {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+.cue__line {
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(var(--on-dark-soft), transparent);
+  position: relative;
+  overflow: hidden;
+}
+.cue__line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  animation: cue-run 2s var(--ease-out) infinite;
+}
+@keyframes cue-run {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(100%); }
+}
+
+/* ===========================================================================
+   Buffering hint — shown only when the scroll has outrun the download
+   =========================================================================== */
+
+.buffering {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-10);
+  transform: translateX(-50%);
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--on-dark-soft);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-out);
+}
+.buffering.is-active {
+  opacity: 1;
+}
+.buffering__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: buffer-pulse 1s ease-in-out infinite;
+}
+@keyframes buffer-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ===========================================================================
+   Intro title (over the first seconds of film)
+   =========================================================================== */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-6);
+  padding: var(--edge);
+  will-change: opacity, transform;
+}
+.intro__kicker {
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+.intro__title {
+  font-size: clamp(2.6rem, 8vw, 6rem);
+  color: var(--white);
+  letter-spacing: 0.01em;
+}
+.intro__sub {
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  color: var(--on-dark);
+  max-width: 34rem;
+}
+
+/* ===========================================================================
+   Finale — the only genuinely scrolling panel, after the film
+   =========================================================================== */
+
+.finale {
+  position: relative;
+  z-index: var(--z-overlay);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-6);
+  padding: clamp(96px, 14vh, 140px) var(--edge) var(--space-16);
+  background: var(--black);
+}
+.finale__kicker {
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+.finale__title {
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  color: var(--white);
+  max-width: 18rem;
+}
+.finale__body {
+  font-size: 1rem;
+  color: var(--on-dark-soft);
+  max-width: 30rem;
+}
+.finale__cta {
+  margin-top: var(--space-2);
+  font-size: 12px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--white);
+  border: 1px solid var(--gold);
+  padding: var(--space-4) var(--space-12);
+  transition: background var(--transition), color var(--transition);
+}
+.finale__cta:hover {
+  background: var(--gold);
+  color: var(--black);
+}
+.finale__index {
+  margin-top: var(--space-10);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 2px var(--space-6);
+  width: min(660px, 92vw);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: var(--space-6);
+}
+.finale__chapter {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--on-dark-soft);
+  text-align: left;
+  transition: color var(--transition);
+}
+.finale__chapter:hover {
+  color: var(--white);
+}
+.finale__chapter span {
+  color: var(--gold);
+  font-family: var(--font-display);
+}
+
+/* ===========================================================================
+   Reduced motion / mobile
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .cue__line::after,
+  .hotspot__dot::after {
+    animation: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .rail {
+    display: none;
+  }
+  .chapter {
+    left: var(--edge);
+    right: var(--edge);
+    bottom: clamp(88px, 18vh, 140px);
+    max-width: none;
+  }
+  .chapter__observed {
+    display: none;
+  }
+  .stage__video {
+    transform: scale(1.04);
+  }
+  .hotspot__panel {
+    left: auto;
+    right: 22px;
+  }
+}
