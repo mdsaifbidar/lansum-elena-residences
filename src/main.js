@@ -212,6 +212,7 @@ function boot() {
       video: dom.video,
       track: dom.track,
       bandScale: BAND_SCALE,
+      isMobile,
       onUpdate: onScrub,
       onReady: () => ScrollTrigger.refresh(),
     });

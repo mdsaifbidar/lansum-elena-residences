@@ -20,8 +20,8 @@ export const VIDEO_TIERS = {
   hd: { src: '/walkthrough-hd.mp4', w: 1280, h: 720, label: 'HD' },
   // 960x540 · 16fps · crf30 · short GOP — default, ~32MB
   sd: { src: '/walkthrough-sd.mp4', w: 960, h: 540, label: 'SD' },
-  // 854x480 · 20fps · crf31 — phones (hi-DPI friendly), ~22MB
-  mobile: { src: '/walkthrough-mobile.mp4', w: 854, h: 480, label: 'Mobile' },
+  // 640x360 · 15fps · crf30 · GOP 4 — light so a seek is cheap on a phone CPU, ~12MB
+  mobile: { src: '/walkthrough-mobile.mp4', w: 640, h: 360, label: 'Mobile' },
 };
 
 const TIER_KEYS = Object.keys(VIDEO_TIERS);

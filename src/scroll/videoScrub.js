@@ -29,14 +29,19 @@ gsap.registerPlugin(ScrollTrigger);
  * @param {(t:number, p:number)=>void} [o.onUpdate]  called each frame with (time, 0..1)
  * @param {()=>void}         [o.onReady]
  */
-export function initVideoScrub({ video, track, onUpdate, onReady, bandScale = 1 }) {
+export function initVideoScrub({
+  video,
+  track,
+  onUpdate,
+  onReady,
+  bandScale = 1,
+  isMobile = false,
+}) {
   let duration = VIDEO_DURATION;
   let targetTime = 0;
   let easedTime = 0;
   let ready = false;
-  let seeking = false;
   let lastSeek = -1;
-  let seekIssuedAt = 0;
 
   let { bands, totalPx } = buildBands(window.innerHeight, bandScale);
 
@@ -70,9 +75,6 @@ export function initVideoScrub({ video, track, onUpdate, onReady, bandScale = 1 
   if (video.readyState >= 1) markReady();
   video.addEventListener('loadedmetadata', markReady);
   video.addEventListener('canplay', markReady);
-  video.addEventListener('seeked', () => {
-    seeking = false;
-  });
 
   const st = ScrollTrigger.create({
     trigger: track,
@@ -84,8 +86,11 @@ export function initVideoScrub({ video, track, onUpdate, onReady, bandScale = 1 
     },
   });
 
-  const MIN_SEEK_DELTA = 0.035; // ~one frame
-  const SEEK_INTERVAL = 40; // ms between seeks — give the decoder room to settle
+  const MIN_SEEK_DELTA = 1 / 30; // don't bother seeking for a sub-frame move
+  // steady seek cadence beats waiting for each 'seeked' event: the browser
+  // coalesces an in-flight seek when a new currentTime is set, so issuing on a
+  // fixed interval keeps the picture tracking the scroll instead of stop-go.
+  const SEEK_INTERVAL = isMobile ? 45 : 28;
   let lastSeekAt = 0;
   let waitingOnBuffer = false;
 
@@ -99,28 +104,22 @@ export function initVideoScrub({ video, track, onUpdate, onReady, bandScale = 1 
     const diff = goal - easedTime;
     if (Math.abs(diff) < 0.01) easedTime = goal;
     else if (Math.abs(diff) > 6) easedTime += diff * 0.5; // chapter jump / catch-up
-    else easedTime += diff * 0.16;
+    else easedTime += diff * (isMobile ? 0.22 : 0.16);
     easedTime = Math.max(0, Math.min(easedTime, duration - 0.05, cap));
-
-    if (seeking && performance.now() - seekIssuedAt > 200) seeking = false;
 
     const now = performance.now();
     if (
       ready &&
-      !seeking &&
-      video.readyState >= 2 &&
       now - lastSeekAt >= SEEK_INTERVAL &&
       Math.abs(easedTime - lastSeek) >= MIN_SEEK_DELTA
     ) {
-      seeking = true;
-      seekIssuedAt = now;
       lastSeekAt = now;
       lastSeek = easedTime;
       try {
         if ('fastSeek' in video) video.fastSeek(easedTime);
         else video.currentTime = easedTime;
       } catch (e) {
-        seeking = false;
+        /* ignore — next tick retries */
       }
     }
 
