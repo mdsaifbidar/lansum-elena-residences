@@ -8,9 +8,13 @@
  * levels, materials or brands is asserted — the film does not state them.
  *
  * `dwell` = how many viewport-heights of scrolling that chapter occupies,
- * INDEPENDENT of how long its footage is. This is what lets you move slowly
- * through a room the film only spends 5 seconds on. Rooms dwell; transitions
- * and aerials move quicker. Tune freely.
+ * INDEPENDENT of how long its footage is.
+ *
+ * The source film is a montage that cuts every ~2-2.5s, so dwell is set high
+ * enough (~180px of scroll per second of footage) that a single scroll gesture
+ * stays inside one shot instead of skipping through several. Total ~53
+ * viewport-heights of scrolling — it is a long, deliberate page by design.
+ * Halve every value here (or set PACE to 0.5) for a quicker walkthrough.
  */
 
 export const VIDEO_DURATION = 240; // trimmed just before the film's own end card
@@ -23,7 +27,7 @@ export const CHAPTERS = [
     kicker: 'Prologue',
     start: 0,
     end: 15,
-    dwell: 1.1,
+    dwell: 3.0,
     line: 'First light over the city — an invitation to slow down.',
     observed: ['Sunrise skyline', 'Flight over the city', 'A tree-lined approach'],
     hotspots: [],
@@ -34,7 +38,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 01',
     start: 15,
     end: 43,
-    dwell: 1.7,
+    dwell: 5.4,
     line: 'Two towers rise from the canopy, framed by old trees.',
     observed: ['Twin residential towers', 'Timber screen with the Elena mark', 'Landscaped forecourt'],
     hotspots: [
@@ -47,7 +51,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 02',
     start: 43,
     end: 50.5,
-    dwell: 0.9,
+    dwell: 1.5,
     line: 'A slow turn around the architecture.',
     observed: ['Sculpted tower facade', 'Arrival driveway', 'Aerial orbit of the massing'],
     hotspots: [],
@@ -58,7 +62,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 03',
     start: 50.5,
     end: 63.5,
-    dwell: 1.3,
+    dwell: 2.7,
     line: 'Water held quietly between the wings of the building.',
     observed: ['Reflecting water court', 'Flowering planting', 'A canopy of tall trees'],
     hotspots: [
@@ -71,7 +75,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 04',
     start: 63.5,
     end: 82,
-    dwell: 1.6,
+    dwell: 3.9,
     line: 'Trails through the trees, and room to move in the open air.',
     observed: ['Timber nature boardwalk', 'Open-air fitness deck under a canopy', 'Garden lawns'],
     hotspots: [
@@ -84,7 +88,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 05',
     start: 82,
     end: 91,
-    dwell: 1.1,
+    dwell: 1.9,
     line: 'Sheltered places to sit, read and look out over the green.',
     observed: ['Sun-loungers on a garden terrace', 'A covered reading pavilion', 'Perforated art screens'],
     hotspots: [],
@@ -95,7 +99,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 06',
     start: 91,
     end: 103,
-    dwell: 2.6,
+    dwell: 3.3,
     line: 'Where light, proportion and openness meet.',
     observed: ['Full-height glazing', 'A fluted room divider', 'Framed artwork and a ceiling fan'],
     hotspots: [
@@ -108,7 +112,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 07',
     start: 103,
     end: 115,
-    dwell: 2.4,
+    dwell: 3.3,
     line: 'A table set beneath a soft, circular light.',
     observed: ['Stone-topped dining table', 'A round wall mirror', 'Panelled walls, fresh tulips'],
     hotspots: [
@@ -121,7 +125,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 08',
     start: 115,
     end: 120,
-    dwell: 1.8,
+    dwell: 1.5,
     line: 'The heart of the home — bright and unfussy.',
     observed: ['A central island', 'Pale cabinetry', 'A breakfast setting by the window'],
     hotspots: [
@@ -134,7 +138,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 09',
     start: 120,
     end: 130.5,
-    dwell: 2.6,
+    dwell: 2.9,
     line: 'Rest and recharge, wrapped in quiet colour.',
     observed: ['A textured accent wall', 'Suspended bedside lights', 'A low, wide bed'],
     hotspots: [
@@ -158,7 +162,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 11',
     start: 133,
     end: 161,
-    dwell: 1.8,
+    dwell: 5.8,
     line: 'Between the buildings, a landscape to wander.',
     observed: ['A hanging chair among the trees', 'Sculpted tree planters', 'A pergola walk and glass-and-timber pavilions'],
     hotspots: [
@@ -171,7 +175,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 12',
     start: 161,
     end: 187,
-    dwell: 1.7,
+    dwell: 5.3,
     line: 'A court to play on, and water to sit beside.',
     observed: ['A multi-sport court', 'A lily pond in bloom', 'Fountains in a reflecting basin'],
     hotspots: [
@@ -184,7 +188,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 13',
     start: 187,
     end: 200.5,
-    dwell: 1.5,
+    dwell: 3.0,
     line: 'The water turns to glass as the light drops.',
     observed: ['An edge-lit pool', 'The towers at dusk', 'A deck opening to the skyline'],
     hotspots: [
@@ -197,7 +201,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 14',
     start: 200.5,
     end: 214.5,
-    dwell: 1.5,
+    dwell: 3.0,
     line: 'A moment to stand still and watch the city glow.',
     observed: ['A gilded stag sculpture', 'The pool against the skyline', 'Warm, low sun'],
     hotspots: [
@@ -210,7 +214,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 15',
     start: 214.5,
     end: 232.5,
-    dwell: 1.4,
+    dwell: 3.7,
     line: 'Low light, soft seating, the garden lit like a room.',
     observed: ['Curved outdoor seating', 'Candlelit planting', 'Lanterns among the leaves'],
     hotspots: [],
@@ -221,7 +225,7 @@ export const CHAPTERS = [
     kicker: 'Chapter 16',
     start: 231,
     end: 240,
-    dwell: 1.3,
+    dwell: 2.0,
     line: 'A terrace for looking up — and the lake set adrift with light.',
     observed: ['Telescopes on a viewing deck', 'City lights below', 'Lanterns rising over the lake'],
     hotspots: [
