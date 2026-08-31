@@ -591,24 +591,179 @@ a {
   }
 }
 
+/* ===========================================================================
+   Mobile progress bar (replaces the desktop rail)
+   =========================================================================== */
+
+.m-progress {
+  display: none;
+}
+
 @media (max-width: 860px) {
+  .m-progress {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-nav);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 var(--edge)
+      calc(8px + env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+  }
+  .m-progress__label {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--on-dark-soft);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+  }
+  .m-progress__label b {
+    color: var(--gold-bright);
+    font-weight: 500;
+  }
+  .m-progress__track {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .m-progress__fill {
+    height: 100%;
+    width: 0%;
+    background: var(--gold);
+  }
+}
+
+/* ===========================================================================
+   Mobile layout
+   =========================================================================== */
+
+@media (max-width: 860px) {
+  :root {
+    --edge: 18px;
+  }
+
   .rail {
     display: none;
   }
+
+  /* topbar — keep just the wordmark, park the CTA in the finale */
+  .topbar {
+    padding: var(--space-5) var(--edge);
+  }
+  .topbar__mark {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-indent: 0.16em;
+  }
+  .topbar__cta {
+    display: none;
+  }
+
+  .intro {
+    gap: var(--space-4);
+  }
+  .intro__kicker {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+  }
+  .intro__title {
+    font-size: clamp(1.8rem, 8vw, 2.6rem);
+    line-height: 1.08;
+  }
+  .intro__sub {
+    font-size: 0.92rem;
+    max-width: 28ch;
+  }
+
   .chapter {
     left: var(--edge);
     right: var(--edge);
-    bottom: clamp(88px, 18vh, 140px);
+    bottom: 64px; /* clears the m-progress bar */
     max-width: none;
+    text-shadow: 0 1px 24px rgba(0, 0, 0, 0.6);
+  }
+  .chapter__kicker {
+    font-size: 10px;
+  }
+  .chapter__title {
+    font-size: clamp(2rem, 8.5vw, 2.6rem);
+  }
+  .chapter__line {
+    font-size: 0.95rem;
+    max-width: 34ch;
   }
   .chapter__observed {
     display: none;
   }
+
   .stage__video {
-    transform: scale(1.04);
+    transform: scale(1.02);
+    /* favour the upper-middle of each landscape shot when cropped to portrait */
+    object-position: center 38%;
+  }
+
+  /* hotspots — bigger tap target, panel as a bottom sheet */
+  .hotspot__dot {
+    width: 15px;
+    height: 15px;
   }
   .hotspot__panel {
-    left: auto;
-    right: 22px;
+    position: fixed;
+    left: var(--edge);
+    right: var(--edge);
+    top: auto;
+    bottom: 96px;
+    transform: none;
+    max-width: none;
+    text-align: center;
+    padding: var(--space-4);
+    font-size: 13px;
+  }
+  .hotspot:hover .hotspot__panel {
+    opacity: 0;
+  }
+  .hotspot.is-open .hotspot__panel {
+    opacity: 1;
+    transform: none;
+  }
+
+  .cue,
+  .buffering {
+    bottom: 60px;
+  }
+
+  .finale {
+    justify-content: center;
+    padding: 96px var(--edge) var(--space-12);
+    gap: var(--space-5);
+  }
+  .finale__title {
+    font-size: clamp(1.7rem, 7vw, 2.2rem);
+    max-width: 15ch;
+    margin-bottom: var(--space-1);
+  }
+  .finale__body {
+    font-size: 0.9rem;
+    max-width: 34ch;
+  }
+  .finale__cta {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+  }
+  .finale__index {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 3px var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+  }
+  .finale__chapter {
+    font-size: 11px;
+    gap: 6px;
+  }
+  .finale__chapter span {
+    font-size: 10px;
   }
 }

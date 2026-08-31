@@ -28,6 +28,9 @@ const dom = {
   rail: document.getElementById('rail'),
   track: document.getElementById('track'),
   finaleIndex: document.getElementById('finale-index'),
+  mProgress: document.getElementById('m-progress'),
+  mProgressFill: document.getElementById('m-progress-fill'),
+  mProgressLabel: document.getElementById('m-progress-label'),
 };
 
 /* ---------------------------------------------------------------------------
@@ -36,7 +39,11 @@ const dom = {
 const lenis = new Lenis({
   lerp: reduced ? 1 : 0.12,
   smoothWheel: !reduced,
-  syncTouch: false,
+  // drive touch scrolling through Lenis too, so the scrub stays connected to
+  // the finger instead of coasting on native momentum past several shots
+  syncTouch: isMobile && !reduced,
+  syncTouchLerp: 0.09,
+  touchInertiaMultiplier: 12,
 });
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -45,7 +52,7 @@ gsap.ticker.lagSmoothing(0);
 /* ---------------------------------------------------------------------------
    Scroll height for the film
    ------------------------------------------------------------------------- */
-const BAND_SCALE = isMobile ? 0.82 : 1;
+const BAND_SCALE = isMobile ? 0.5 : 1;
 function sizeTrack() {
   // height = sum of every chapter's dwell (viewport-heights), so each room
   // gets its own generous stretch of scroll regardless of footage length.
@@ -110,12 +117,30 @@ function onScrub(time, _p, waitingOnBuffer) {
     dom.cue.classList.remove('is-gone');
   }
 
-  // clear the rail + chapter card only at the very end, as the finale takes over
-  const endFade = clamp((p - 0.992) / 0.008);
+  // clear the rail + chapter card + mobile bar as the finale scrolls in.
+  // Drive it off actual scroll position vs the track end, so it's fully gone
+  // by the time the finale is on screen (video progress never quite hits 1).
+  const trackEnd = dom.track.offsetHeight - window.innerHeight;
+  const endFade = clamp((window.scrollY - (trackEnd - window.innerHeight * 0.6)) / (window.innerHeight * 0.6));
   gsap.set([dom.rail, dom.chapters], {
     opacity: 1 - endFade,
     pointerEvents: endFade > 0.5 ? 'none' : 'auto',
   });
+
+  // mobile progress bar (stands in for the hidden rail)
+  if (dom.mProgress) {
+    let ci = 0;
+    for (let i = CHAPTERS.length - 1; i >= 0; i -= 1) {
+      if (time >= CHAPTERS[i].start) {
+        ci = i;
+        break;
+      }
+    }
+    dom.mProgressFill.style.width = (p * 100).toFixed(1) + '%';
+    dom.mProgressLabel.innerHTML =
+      `<b>${CHAPTERS[ci].kicker}</b>&nbsp; ${CHAPTERS[ci].title}`;
+    gsap.set(dom.mProgress, { opacity: 1 - endFade });
+  }
 
   // very subtle breathing parallax on the film (skip if reduced motion)
   if (!reduced) {
