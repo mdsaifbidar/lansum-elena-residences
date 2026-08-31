@@ -11,14 +11,15 @@
  * INDEPENDENT of how long its footage is.
  *
  * The source film is a montage that cuts every ~2-2.5s, so dwell is set high
- * enough (~180px of scroll per second of footage) that a single scroll gesture
- * stays inside one shot instead of skipping through several. Total ~53
- * viewport-heights of scrolling — it is a long, deliberate page by design.
- * Halve every value here (or set PACE to 0.5) for a quicker walkthrough.
+ * enough that a single scroll gesture stays inside one shot instead of
+ * skipping through several. With PACE 1.8 the whole walkthrough is ~96
+ * viewport-heights of scrolling (~320px of scroll per second of footage) — a
+ * very long, deliberate page by design. Lower PACE for a quicker walkthrough
+ * (1.0 ≈ 53 viewports, 0.6 ≈ 32).
  */
 
 export const VIDEO_DURATION = 240; // trimmed just before the film's own end card
-export const PACE = 1.0; // global multiplier on every chapter's dwell
+export const PACE = 1.8; // global multiplier on every chapter's dwell (1.0 = base)
 
 export const CHAPTERS = [
   {
